@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Users &laquo; Admin</title>
+  <link rel="stylesheet" href="/assets/vendors/bootstrap/css/bootstrap.css">
+  <link rel="stylesheet" href="/assets/vendors/font-awesome/css/font-awesome.css">
+  <link rel="stylesheet" href="/assets/vendors/nprogress/nprogress.css">
+  <link rel="stylesheet" href="/assets/css/admin.css">
+  <script src="/assets/vendors/nprogress/nprogress.js"></script>
+  <style>
+    label.error{
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <script>NProgress.start()</script>
+
+  
+    
+
+    <div class="container-fluid">
+     
+      <!-- 有错误信息时展示 -->
+      <!-- <div class="alert alert-danger">
+        <strong>错误！</strong>发生XXX错误
+      </div> -->
+      <div class="row">
+        <div class="col-md-4">
+          <form>
+            <h5 style="text-indent:-99em;">添加新用户</h5>
+            <div class="form-group">
+              <label for="email">邮箱</label>
+              <input id="email" class="form-control" name="email" type="email" placeholder="邮箱">
+            </div>
+            <div class="form-group">
+              <label for="nickname">昵称</label>
+              <input id="nickname" class="form-control" name="nickname" type="text" placeholder="昵称">
+            </div>
+            <div class="form-group">
+              <label for="tel">电话</label>
+              <input id="tel" class="form-control" name="tel" type="text" placeholder="电话">
+            </div>
+            <div class="form-group">
+              <label for="password">密码</label>
+              <input id="password" class="form-control" name="password" type="text" placeholder="密码">
+            </div>
+            <div class="form-group">
+              <label for="password2">确认密码</label>
+              <input id="password2" class="form-control" name="password2" type="text" placeholder="确认密码">
+            </div>
+            <div class="form-group">
+              <button class="btn btn-primary" type="submit" id="tin-btn">添加</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+  <script src="/assets/vendors/jquery/jquery.js"></script>
+  <script src="/assets/vendors/bootstrap/js/bootstrap.js"></script>
+  <script src="/assets/vendors/validate/jquery.validate.js"></script>
+  <script>NProgress.done()</script>
+  <script>
+    jQuery.validator.addMethod("isMobile", function(value, element) {	
+      var length = value.length;	
+      var mobile = /^(13[0-9]{9})|(18[0-9]{9})|(14[0-9]{9})|(17[0-9]{9})|(15[0-9]{9})$/;	
+      return this.optional(element) || (length == 11 && mobile.test(value));	
+    }, "请正确填写手机号码");	
+
+    $('#tin-btn').click(function(){
+      $('form').validate({
+        rules:{
+          email:{
+            required: true,   //必填项
+            email:true,
+            minlength: 6
+          },
+          password:{
+            required: true,
+            digits: true,    //必须为纯数字
+            rangelength: [5, 10], //长度必须在5-10之间
+          },
+          password2:{
+            equalTo:$('#password')
+          },
+          tel:{
+            isMobile:true
+          }
+        },
+        messages:{
+          email:{
+            required:"用户名必填",   
+            email:"填写正常的邮箱格式",
+            minlength: "最短6位",
+          },
+          password:{
+            required:  "密码必填",
+            digits:  "密码必须为纯数字",    
+            rangelength:  "密码长度在5-10位之间", 
+          },
+          password2:{
+            equalTo:'两次密码要一致'
+          },
+          tel:{
+            isMobile:"请正确填写手机号码"
+          }
+        },
+        submitHandler:function(){
+          $.ajax({
+            url:'/api/user/addUserDeal',
+            type:'post',
+            data:$('form').serialize(),
+            dataType:'json',
+            success:function(msg){
+              alert(msg.message);
+              if(msg.code ==200){
+                parent.location.reload();
+              }
+            }
+          })
+        }
+      })
+     
+    })
+
+   
+  </script>
+</body>
+</html>

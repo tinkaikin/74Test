@@ -1,0 +1,58 @@
+{{extend '../layout/layout.html'}}
+
+
+{{block 'main'}}
+<div class="container-fluid">
+  <div class="page-title">
+    <h1>添加栏目</h1>
+  </div>
+  <!-- 有错误信息时展示 -->
+  <!-- <div class="alert alert-danger">
+    <strong>错误！</strong>发生XXX错误
+  </div> -->
+  <div class="row">
+    <div class="col-md-4">
+      <!-- <form action="/admin/cate/addCatePost" method="POST"> -->
+        <!-- 尝试用ajax -->
+      <form id="formId">
+        <h2>添加新栏目</h2>
+        <div class="form-group">
+          <label for="name">名称</label>
+          <input id="name" class="form-control" name="name" type="text" placeholder="分类名称">
+        </div>
+        <div class="form-group">
+          <label for="icon">图标</label>
+          <input id="icon" class="form-control" name="icon" type="text" placeholder="图标">
+        </div>
+        <div class="form-group">
+          <button class="btn btn-primary" type="button" id="btn">添加</button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+{{/block}}
+
+
+<!-- js代码  -->
+{{block 'js'}}
+<script>
+  $(function(){
+    $('#btn').click(function(){
+      $.ajax({
+        url:'/admin/cate/addCatePost',
+        type:'post',
+        data:$('#formId').serialize(),
+        success:function(data){
+          alert(data.msg);
+          if(data.code == 200){
+            location.replace('/admin/cate/cate');
+          }
+        }
+      })
+      return false;
+    })
+  }) 
+</script>
+{{/block}}

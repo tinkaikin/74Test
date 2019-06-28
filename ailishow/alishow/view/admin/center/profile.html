@@ -1,0 +1,120 @@
+{{extend '../layout/layout.html'}}
+
+
+{{block 'main'}}
+
+<div class="container-fluid">
+    <div class="page-title">
+      <h1>我的个人资料</h1>
+    </div>
+    <!-- 有错误信息时展示 -->
+    <!-- <div class="alert alert-danger">
+      <strong>错误！</strong>发生XXX错误
+    </div> -->
+
+    <form class="form-horizontal">
+      <script type="text/html" id="tpl">
+      <div class="form-group">
+        <label class="col-sm-3 control-label">头像</label>
+        <div class="col-sm-6">
+          <label class="form-image">
+            <input id="avatar" type="file">
+            <img id="tin-pic" src="{#admin_pic#}">
+            <i class="mask fa fa-upload"></i>
+            <input name="pic" type="hidden" value="{#admin_pic#}" id="tin_admin_pic">
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="email" class="col-sm-3 control-label">邮箱</label>
+        <div class="col-sm-6">
+          <input id="email" class="form-control" name="email" type="type" value="{#admin_email#}" readonly>
+          <p class="help-block">登录邮箱不允许修改</p>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="nickname" class="col-sm-3 control-label">昵称</label>
+        <div class="col-sm-6">
+          <input id="nickname" class="form-control" name="nickname" type="type" value="{#admin_nickname#}" >
+          <p class="help-block">限制在 2-16 个字符</p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="bio" class="col-sm-3 control-label">简介</label>
+        <div class="col-sm-6">
+          <textarea id="bio" class="form-control" cols="30" rows="6" name="sign">{#admin_sign#}</textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-6">
+          <button type="button" id="tin-upbtn" class="btn btn-primary" >更新</button>
+          <a class="btn btn-link" href="/admin/center/password-reset">修改密码</a>
+        </div>
+      </div>
+    </script>
+    </form>
+  </div>
+
+{{/block}}
+
+{{block 'js'}}
+<script src="/assets/vendors/art-template/template-web.js"></script>
+<script>
+template.defaults.rules[1].test = /{#([@#]?)[ \t]*(\/?)([\w\W]*?)[ \t]*#}/;
+$.ajax({
+  url:'/api/center/getAdminById',
+  type:'post',
+  dataType:'json',
+  success:function(msg){
+    if(msg.code==200){
+      let str = template('tpl',msg.data)
+      $('form').html(str);
+      $('#avatar').change(function(){
+    const fileObj = this.files[0]
+    const fd = new FormData();
+    fd.append('avatar',fileObj); 
+     //这个是有问题的  考虑怎么解决
+          $.ajax({
+            url:'/api/uploads',
+            type:'post',
+            contentType:false,
+            processData:false,
+            dataType:'json',
+            data:fd,
+            success:function(msg){
+              alert(msg.message)
+              if(msg.code==200){
+                $('#tin-pic').attr('src',msg.path);
+                $('#tin_admin_pic').val(msg.path);
+              }
+            }
+          })
+        })
+
+        $('#tin-upbtn').click(function(){
+          $.ajax({
+            url:'/api/center/personal',
+            type:'post',
+            data: $('form').serialize(),
+            dataType:'json',
+            success:function(msg){
+              alert(msg.message);
+              if(msg.code==200){
+                location.href = '/admin/index'
+              }
+            }
+          })
+        })
+
+    }
+  }
+})
+
+
+
+  
+</script>
+
+
+{{/block}}

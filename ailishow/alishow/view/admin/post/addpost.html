@@ -1,0 +1,134 @@
+{{extend '../layout/layout.html'}}
+
+{{block 'main'}}
+<div class="container-fluid">
+  <div class="page-title">
+    <h1>写文章</h1>
+  </div>
+  <!-- 有错误信息时展示 -->
+  <!-- <div class="alert alert-danger">
+    <strong>错误！</strong>发生XXX错误
+  </div> -->
+  <form class="row">
+    <div class="col-md-9">
+      <div class="form-group">
+        <label for="title">标题</label>
+        <input id="title" class="form-control input-lg" name="title" type="text" placeholder="文章标题">
+      </div>
+      <div class="form-group">
+        <label for="desc">文章摘要</label>
+        <input id="desc" class="form-control input-lg" name="desc" type="text" placeholder="文章摘要">
+      </div>
+      <div class="form-group">
+        <label for="content">内容</label>
+        <textarea id="content" class="form-control input-lg" name="content"></textarea>
+      </div>
+    </div>
+    <div class="col-md-3">
+      
+      <div class="form-group">
+        <label for="feature">特色图像</label>
+        <input type="hidden" name="pic" value="" id="tin-pic">
+        <!-- show when image chose -->
+        <img class="help-block thumbnail" style="display: none" src="">
+        <input id="feature" class="form-control" name="feature" type="file">
+      </div>
+      <div class="form-group">
+        <label for="category">所属分类</label>
+        <select id="category" class="form-control" name="category">
+          <!-- <option value="1">未分类</option>
+          <option value="2">潮生活</option> -->
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="status">状态</label>
+        <select id="status" class="form-control" name="status">
+          <option value="草稿">草稿</option>
+          <option value="已发布">已发布</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <button class="btn btn-primary" type="button" id="tin-submit">保存</button>
+      </div>
+    </div>
+  </form>
+</div>
+{{/block}}
+
+{{block 'link'}}
+<link href="/assets/vendors/umeditor/themes/default/css/umeditor.css" type="text/css" rel="stylesheet">	
+{{/block}}
+
+{{block 'js'}}
+<script type="text/javascript" src="/assets/vendors/umeditor/third-party/jquery.min.js"></script>	
+<script type="text/javascript" charset="utf-8" src="/assets/vendors/umeditor/umeditor.config.js"></script>	
+<script type="text/javascript" charset="utf-8" src="/assets/vendors/umeditor/umeditor.min.js"></script>	
+<script type="text/javascript" src="/assets/vendors/umeditor/lang/zh-cn/zh-cn.js"></script>	
+
+<script>
+  //实例一个 富文本框
+  let um = UM.getEditor('content',{
+      initialFrameWidth:'100%' //初始化编辑器宽度,默认500
+      ,initialFrameHeight:200  //初始化编辑器高度,默认500
+      ,initialContent:'发发牢骚! YY一下' 
+  })
+  //获取栏目信息
+  $.ajax({
+    url:'/api/cate/getCate',
+    dataType:'json',
+    type:'post',
+    success:function(msg){
+      if(msg.code == 200){
+        msg.data.forEach((v,k) => {
+          $(`
+            <option value="${v.cate_id}">${v.cate_name}</option>
+            `).appendTo('#category');
+        })
+      }
+    }
+  })
+
+  $('#feature').change(function(){
+    //获取文本对象
+    const fileObj = this.files[0];
+    //实例FormData
+    const fd = new FormData();
+    //添加数据
+    fd.append('avatar',fileObj);
+    //添加到数据库
+    $.ajax({
+      url:'/api/uploads',
+      type:'post',
+      data:fd,
+      dataType:'json',
+      contentType:false,
+      processData:false,
+      success:function(msg){
+        alert(msg.message);
+        $('.thumbnail').attr('src',msg.path).show();
+        $('#tin-pic').val(msg.path);
+      }
+    })
+  })
+
+
+  //保存提交数据
+  $('#tin-submit').click(function(){
+    var str = $('form').serialize();
+    $.ajax({
+      url:'/api/post/addpost',
+      type:'post',
+      data:str,
+      dataType:'json',
+      success:function(msg){
+        alert(msg.message);
+        if(msg.code == 200){
+          location.href = '/admin/index';
+        }
+      }
+    })
+  })
+
+</script>
+{{/block}}

@@ -1,0 +1,56 @@
+{{extend '../layout/layout.html'}}
+
+{{block 'main'}}
+<div class="container-fluid">
+  <div class="page-title">
+    <h1>修改栏目</h1>
+  </div>
+  <!-- 有错误信息时展示 -->
+  <!-- <div class="alert alert-danger">
+    <strong>错误！</strong>发生XXX错误
+  </div> -->
+  <div class="row">
+    <div class="col-md-4" id="lalal">
+      <form>
+        <h2>添加新栏目</h2>
+        <div class="form-group">
+          <input value="{{cate_id}}" id="id" class="form-control" name="id" type="hidden" >
+        </div>
+        <div class="form-group">
+          <label for="name">名称</label>
+          <input value="{{cate_name}}" id="name" class="form-control" name="name" type="text">
+        </div>
+        <div class="form-group">
+          <label for="icon">图标</label>
+          <input value="{{cate_icon}}" id="icon" class="form-control" name="icon" type="text">
+        </div>
+        <div class="form-group">
+          <button class="btn btn-primary" type="button">修改</button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+{{/block}}
+{{block 'js'}}
+<script>
+  $(function(){
+    $('.btn-primary').click(function(){
+      $.ajax({
+        url:'/admin/cate/upCatePost',
+        type:'post',
+        data:$('form').serialize(),
+        dataType:'json',
+        success:function(msg){
+          alert('修改成功')
+          if(msg.code == 200){
+            location.href = '/admin/cate/cate'
+          }
+        }
+      })
+
+    })
+  })
+</script>
+{{/block}}
